@@ -1,31 +1,62 @@
-# Organizador Diario (auto inicio)
+# Organizador Diario (auto inicio + notificaciones)
 
-Aplicación simple en Python (Tkinter) para organizar tareas personales con persistencia local.
+Aplicación de escritorio en Python (Tkinter) para organizar tareas personales, con mejor diseño visual, notificaciones de vencimiento y opción de instalación.
 
 ## Funciones
 
+- Diseño más limpio con cabecera, tarjetas y estado de tareas.
 - Crear tareas con título, categoría, prioridad y fecha límite.
-- Marcar tareas como completadas.
-- Eliminar tareas.
-- Orden automático por estado y prioridad.
+- Marcar tareas como completadas y eliminar tareas.
+- Indicador de estadísticas (`pendientes` y `completadas`).
+- Orden automático por estado, prioridad y fecha.
 - Guardado automático en `~/.organizador/tasks.json`.
+- Notificaciones para tareas que vencen hoy:
+  - Linux: `notify-send`
+  - macOS: `osascript`
+  - Windows: mensaje emergente dentro de la app.
 
 ## Requisitos
 
 - Python 3.10+
-- Tkinter (normalmente incluido con Python en Windows/macOS y en muchos Linux).
+- Tkinter
+- (Linux, opcional) `notify-send` para notificaciones del escritorio.
 
-## Ejecutar la aplicación
+## Ejecutar en modo desarrollo
 
 ```bash
 python3 app.py
 ```
 
+## Instalar la aplicación (pip)
+
+Instalación local como app ejecutable:
+
+```bash
+python3 -m pip install .
+```
+
+Después podrás iniciarla con:
+
+```bash
+organizador-diario
+```
+
+## Crear ejecutable instalable (opcional)
+
+Si quieres un binario para distribuir:
+
+```bash
+python3 -m pip install pyinstaller
+pyinstaller --name organizador-diario --onefile --windowed app.py
+```
+
+Se genera en `dist/organizador-diario` (o `.exe` en Windows).
+
 ## Abrir automáticamente al encender la computadora
 
 ### Linux (systemd --user)
 
-1. Crea el archivo `~/.config/systemd/user/organizador.service` con este contenido:
+1. Crea `~/.config/systemd/user/organizador.service`:
 
 ```ini
 [Unit]
@@ -33,8 +64,7 @@ Description=Organizador Diario
 
 [Service]
 Type=simple
-WorkingDirectory=/workspace/ayuda-inicial
-ExecStart=/usr/bin/python3 /workspace/ayuda-inicial/app.py
+ExecStart=/usr/bin/env organizador-diario
 Restart=on-failure
 
 [Install]
@@ -51,14 +81,12 @@ systemctl --user enable --now organizador.service
 ### Windows (carpeta Inicio)
 
 1. Pulsa `Win + R` y abre: `shell:startup`
-2. Crea un archivo `organizador.bat` con:
+2. Crea `organizador.bat` con:
 
 ```bat
 @echo off
-python "C:\ruta\a\ayuda-inicial\app.py"
+organizador-diario
 ```
-
-3. Reinicia sesión para comprobar.
 
 ### macOS (LaunchAgents)
 
@@ -73,8 +101,8 @@ python "C:\ruta\a\ayuda-inicial\app.py"
     <string>com.usuario.organizador</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/python3</string>
-        <string>/ruta/a/ayuda-inicial/app.py</string>
+        <string>/usr/bin/env</string>
+        <string>organizador-diario</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
@@ -87,7 +115,3 @@ python "C:\ruta\a\ayuda-inicial\app.py"
 ```bash
 launchctl load ~/Library/LaunchAgents/com.usuario.organizador.plist
 ```
-
----
-
-Si quieres, te la adapto para que tenga calendario, recordatorios con notificaciones, o sincronización con Google Calendar.
